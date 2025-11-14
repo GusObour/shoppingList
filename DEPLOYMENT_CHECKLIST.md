@@ -3,6 +3,7 @@
 ## Pre-Deployment
 
 ### 1. Environment Variables Setup
+
 - [ ] Generated secure JWT_SECRET (64+ characters)
 - [ ] Generated secure JWT_REFRESH_SECRET (64+ characters)
 - [ ] MongoDB Atlas database created
@@ -10,6 +11,7 @@
 - [ ] `.env` file configured locally (NOT committed to Git)
 
 ### 2. Code Review
+
 - [ ] No console.logs in production code
 - [ ] No hardcoded secrets or passwords
 - [ ] `.gitignore` includes `.env` files
@@ -18,6 +20,7 @@
 - [ ] Mobile responsiveness verified
 
 ### 3. GitHub Setup
+
 - [ ] Repository created on GitHub
 - [ ] Code pushed to GitHub
 - [ ] Repository is public (or private if preferred)
@@ -28,6 +31,7 @@
 ### Option A: Render.com (Recommended - Free Tier Available)
 
 1. **Create Account & New Web Service**
+
    - [ ] Sign up at https://render.com
    - [ ] Click "New +" → "Web Service"
    - [ ] Connect GitHub repository
@@ -40,21 +44,23 @@
      - **Instance Type**: Free
 
 2. **Environment Variables** (Add in Render dashboard)
+
    ```
    NODE_ENV=production
    PORT=5000
-   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/shoppinglist
    JWT_SECRET=your_64_char_generated_secret
    JWT_REFRESH_SECRET=your_64_char_generated_refresh_secret
    JWT_EXPIRE=30m
    JWT_REFRESH_EXPIRE=7d
    CLIENT_URL=https://your-frontend-domain.vercel.app
    ```
+
    - [ ] All variables added
    - [ ] MongoDB URI tested
    - [ ] JWT secrets are secure (not example values)
 
 3. **Deploy**
+
    - [ ] Click "Create Web Service"
    - [ ] Wait for deployment to complete
    - [ ] Copy backend URL (e.g., `https://shopping-list-backend.onrender.com`)
@@ -86,6 +92,7 @@
 ### Option A: Vercel.com (Recommended - Free Tier)
 
 1. **Create Account & Import Project**
+
    - [ ] Sign up at https://vercel.com
    - [ ] Click "Add New..." → "Project"
    - [ ] Import your GitHub repository
@@ -96,10 +103,12 @@
      - **Output Directory**: `build`
 
 2. **Environment Variables**
+
    - [ ] Add: `REACT_APP_API_URL=https://your-backend-url.onrender.com/api`
    - Make sure to include `/api` at the end
 
 3. **Deploy**
+
    - [ ] Click "Deploy"
    - [ ] Wait for build to complete
    - [ ] Copy frontend URL (e.g., `https://shopping-list-xyz.vercel.app`)
@@ -133,6 +142,7 @@
 3. **Redeploy backend** (or it will auto-deploy)
 
 ### CORS Verification
+
 - [ ] Backend `CLIENT_URL` matches frontend URL exactly
 - [ ] No trailing slashes
 - [ ] HTTPS (not HTTP) in production
@@ -140,6 +150,7 @@
 ## Testing Production App
 
 ### Authentication Flow
+
 - [ ] Can access signup page
 - [ ] Can create new account
 - [ ] Receives JWT token
@@ -148,6 +159,7 @@
 - [ ] Token refresh works (wait 30+ min and try using app)
 
 ### Lists Functionality
+
 - [ ] Can create new list
 - [ ] Can view all lists
 - [ ] Can edit list name/store
@@ -155,6 +167,7 @@
 - [ ] Lists persist after refresh
 
 ### Items Functionality
+
 - [ ] Can add single item
 - [ ] Can bulk add items (paste list)
 - [ ] Can edit item details
@@ -164,6 +177,7 @@
 - [ ] Items persist after refresh
 
 ### Views & UI
+
 - [ ] Can switch between normal and grouped view
 - [ ] Theme toggle works (light/dark)
 - [ ] Mobile responsive
@@ -171,6 +185,7 @@
 - [ ] Loading states show correctly
 
 ### Settings Page
+
 - [ ] Can update profile (name, email)
 - [ ] Can change password
 - [ ] Theme toggle works
@@ -230,28 +245,33 @@
 ## Common Issues & Solutions
 
 ### CORS Errors
+
 - **Problem**: "CORS policy blocked"
 - **Solution**: Verify `CLIENT_URL` in backend matches frontend URL exactly
 
 ### Token Expired Errors
+
 - **Problem**: Constant "token expired" messages
 - **Solution**: Check JWT_SECRET is set correctly in production
 
 ### Database Connection Fails
+
 - **Problem**: "MongooseServerSelectionError"
-- **Solution**: 
+- **Solution**:
   - Check MongoDB Atlas network access
   - Verify connection string
   - Ensure password doesn't have special characters (or URL encode them)
 
 ### Backend Sleeping (Render Free Tier)
+
 - **Problem**: First request takes 30+ seconds
-- **Solution**: 
+- **Solution**:
   - Expected on free tier
   - Consider paid plan for instant response
   - Or use cron-job.org to ping every 14 minutes
 
 ### Build Failures
+
 - **Problem**: Deployment fails during build
 - **Solution**:
   - Check build logs

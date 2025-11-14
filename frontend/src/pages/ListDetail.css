@@ -673,3 +673,155 @@
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
 }
 
+/* Price History Styles */
+.price-history {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.price-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.price-history-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.price-trend {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.trend-up {
+  color: #ef4444;
+}
+
+.trend-down {
+  color: #10b981;
+}
+
+.trend-stable {
+  color: var(--text-secondary);
+}
+
+.price-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.price-history-price {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 60px;
+}
+
+.price-history-date {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  flex: 1;
+  text-align: center;
+}
+
+.price-history-store {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.price-avg {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Last Price Suggestion */
+.last-price-suggestion {
+  margin-top: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border: 1px solid #667eea30;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.3s ease;
+}
+
+.last-price-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.last-price-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.last-price-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.last-price-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.use-price-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.use-price-btn:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

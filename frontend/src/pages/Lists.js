@@ -20,13 +20,14 @@ const Lists = () => {
     name: '',
     store: '',
     color: '#007aff',
+    budget: '',
   });
 
   const handleCreateList = async (e) => {
     e.preventDefault();
     const result = await addList(newList);
     if (result.success) {
-      setNewList({ name: '', store: '', color: '#007aff' });
+      setNewList({ name: '', store: '', color: '#007aff', budget: '' });
       setShowCreateModal(false);
     }
   };
@@ -194,6 +195,25 @@ const Lists = () => {
                   />
                   <span className="color-value">{newList.color}</span>
                 </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="listBudget">Budget (optional)</label>
+                <div className="price-input-wrapper">
+                  <span className="currency-symbol">$</span>
+                  <input
+                    type="number"
+                    id="listBudget"
+                    value={newList.budget || ''}
+                    onChange={(e) =>
+                      setNewList({ ...newList, budget: e.target.value })
+                    }
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    style={{ paddingLeft: '28px' }}
+                  />
+                </div>
+                <small className="form-hint">Set a spending limit for this list</small>
               </div>
               <div className="modal-actions">
                 <button

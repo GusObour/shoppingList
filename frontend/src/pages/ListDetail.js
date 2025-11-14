@@ -106,7 +106,9 @@ const ListDetail = () => {
     store: '',
     section: '',
     notes: '',
+    price: '',
   });
+  const [lastPrice, setLastPrice] = useState(null);
 
   // Configure drag-and-drop sensors
   const sensors = useSensors(
@@ -143,6 +145,28 @@ const ListDetail = () => {
     fetchList();
   }, [id, navigate]);
 
+  // Check for last price when item name changes
+  useEffect(() => {
+    if (newItem.name.trim().length > 2) {
+      // Find the most recent item with the same name (case insensitive)
+      const similarItem = items
+        .filter(item => item.name.toLowerCase() === newItem.name.toLowerCase().trim() && item.price)
+        .sort((a, b) => new Date(b.priceUpdatedAt || b.updatedAt) - new Date(a.priceUpdatedAt || a.updatedAt))[0];
+      
+      if (similarItem && similarItem.price) {
+        setLastPrice({
+          price: similarItem.price,
+          date: similarItem.priceUpdatedAt || similarItem.updatedAt,
+          store: similarItem.store,
+        });
+      } else {
+        setLastPrice(null);
+      }
+    } else {
+      setLastPrice(null);
+    }
+  }, [newItem.name, items]);
+
   const handleAddItem = async (e) => {
     e.preventDefault();
     const result = await addItem({
@@ -151,7 +175,8 @@ const ListDetail = () => {
     });
 
     if (result.success) {
-      setNewItem({ name: '', quantity: '1', store: '', section: '', notes: '' });
+      setNewItem({ name: '', quantity: '1', store: '', section: '', notes: '', price: '' });
+      setLastPrice(null);
       setShowAddModal(false);
     }
   };
@@ -605,6 +630,50 @@ const ListDetail = () => {
                   rows="3"
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="itemPrice">Price (optional)</label>
+                <div className="price-input-wrapper">
+                  <span className="currency-symbol">$</span>
+                  <input
+                    type="number"
+                    id="itemPrice"
+                    value={newItem.price || ''}
+                    onChange={(e) =>
+                      setNewItem({ ...newItem, price: e.target.value })
+                    }
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+                <small className="form-hint">Track item cost for budgeting</small>
+                
+                {/* Last Price Suggestion */}
+                {lastPrice && !newItem.price && (
+                  <div className="last-price-suggestion">
+                    <div className="last-price-info">
+                      <span className="last-price-label">💡 Last Purchase</span>
+                      <span className="last-price-value">
+                        ${parseFloat(lastPrice.price).toFixed(2)}
+                      </span>
+                      <span className="last-price-date">
+                        {new Date(lastPrice.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                        {lastPrice.store && ` @ ${lastPrice.store}`}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="use-price-btn"
+                      onClick={() => setNewItem({ ...newItem, price: lastPrice.price })}
+                    >
+                      Use Price
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="modal-actions">
                 <button
                   type="button"
@@ -715,6 +784,53 @@ const ListDetail = () => {
                   />
                 </div>
                 <small className="form-hint">Track item cost for budgeting</small>
+                
+                {/* Price History */}
+                {editingItem.priceHistory && editingItem.priceHistory.length > 0 && (
+                  <div className="price-history">
+                    <div className="price-history-header">
+                      <span className="price-history-title">📊 Price History</span>
+                      {editingItem.priceHistory.length > 1 && (
+                        <span className="price-trend">
+                          {parseFloat(editingItem.priceHistory[editingItem.priceHistory.length - 1].price) > 
+                           parseFloat(editingItem.priceHistory[0].price) ? (
+                            <span className="trend-up">📈 Increasing</span>
+                          ) : parseFloat(editingItem.priceHistory[editingItem.priceHistory.length - 1].price) < 
+                                parseFloat(editingItem.priceHistory[0].price) ? (
+                            <span className="trend-down">📉 Decreasing</span>
+                          ) : (
+                            <span className="trend-stable">➡️ Stable</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    <div className="price-history-list">
+                      {editingItem.priceHistory.slice(-5).reverse().map((history, index) => (
+                        <div key={index} className="price-history-item">
+                          <span className="price-history-price">
+                            ${parseFloat(history.price).toFixed(2)}
+                          </span>
+                          <span className="price-history-date">
+                            {new Date(history.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          {history.store && (
+                            <span className="price-history-store">@ {history.store}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {editingItem.priceHistory.length > 0 && (
+                      <div className="price-avg">
+                        Avg: ${(editingItem.priceHistory.reduce((sum, h) => 
+                          sum + parseFloat(h.price), 0) / editingItem.priceHistory.length).toFixed(2)}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="modal-actions">
                 <button

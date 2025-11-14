@@ -70,6 +70,11 @@ router.post(
       .optional()
       .matches(/^#[0-9A-Fa-f]{6}$/)
       .withMessage('Please provide a valid hex color'),
+    body('budget')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Budget must be a positive number'),
+    body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -81,7 +86,7 @@ router.post(
       });
     }
 
-    const { name, store, color } = req.body;
+    const { name, store, color, budget, currency } = req.body;
 
     try {
       const list = await List.create({
@@ -89,6 +94,8 @@ router.post(
         name,
         store: store || '',
         color: color || '#007aff',
+        budget: budget || null,
+        currency: currency || 'USD',
       });
 
       res.status(201).json({
@@ -166,6 +173,11 @@ router.put(
       .matches(/^#[0-9A-Fa-f]{6}$/)
       .withMessage('Please provide a valid hex color'),
     body('isArchived').optional().isBoolean(),
+    body('budget')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Budget must be a positive number'),
+    body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -190,12 +202,14 @@ router.put(
         });
       }
 
-      const { name, store, color, isArchived } = req.body;
+      const { name, store, color, isArchived, budget, currency } = req.body;
 
       if (name !== undefined) list.name = name;
       if (store !== undefined) list.store = store;
       if (color !== undefined) list.color = color;
       if (isArchived !== undefined) list.isArchived = isArchived;
+      if (budget !== undefined) list.budget = budget;
+      if (currency !== undefined) list.currency = currency;
 
       await list.save();
 

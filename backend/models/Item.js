@@ -53,6 +53,37 @@ const itemSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    price: {
+      type: Number,
+      default: null,
+      min: [0, 'Price cannot be negative'],
+    },
+    currency: {
+      type: String,
+      default: 'USD',
+      enum: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY'],
+      uppercase: true,
+    },
+    priceUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+    priceHistory: [
+      {
+        price: {
+          type: Number,
+          required: true,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+        store: {
+          type: String,
+          default: '',
+        },
+      },
+    ],
   },
   {
     timestamps: true,

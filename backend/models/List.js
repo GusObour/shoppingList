@@ -41,6 +41,17 @@ const listSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    budget: {
+      type: Number,
+      default: null,
+      min: [0, 'Budget cannot be negative'],
+    },
+    currency: {
+      type: String,
+      default: 'USD',
+      enum: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY'],
+      uppercase: true,
+    },
   },
   {
     timestamps: true,

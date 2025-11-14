@@ -110,6 +110,11 @@ router.post(
       .isLength({ max: 500 })
       .withMessage('Notes cannot exceed 500 characters'),
     body('priority').optional().isNumeric(),
+    body('price')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Price must be a positive number'),
+    body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -134,7 +139,7 @@ router.post(
         });
       }
 
-      const { name, quantity, store, section, notes, priority } = req.body;
+      const { name, quantity, store, section, notes, priority, price, currency } = req.body;
 
       // If priority not provided, set to end of list
       let itemPriority = priority;
@@ -145,7 +150,8 @@ router.post(
         itemPriority = maxPriorityItem ? maxPriorityItem.priority + 1 : 0;
       }
 
-      const item = await Item.create({
+      // Prepare item data
+      const itemData = {
         listId,
         userId: req.user._id,
         name,
@@ -154,7 +160,23 @@ router.post(
         section: section || '',
         notes: notes || '',
         priority: itemPriority,
-      });
+      };
+
+      // Add price fields if provided
+      if (price !== undefined && price !== null) {
+        itemData.price = price;
+        itemData.priceUpdatedAt = new Date();
+        itemData.currency = currency || 'USD';
+        
+        // Add to price history
+        itemData.priceHistory = [{
+          price: price,
+          date: new Date(),
+          store: store || list.store || '',
+        }];
+      }
+
+      const item = await Item.create(itemData);
 
       res.status(201).json({
         success: true,
@@ -194,6 +216,11 @@ router.put(
       .withMessage('Notes cannot exceed 500 characters'),
     body('priority').optional().isNumeric(),
     body('isDone').optional().isBoolean(),
+    body('price')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Price must be a positive number'),
+    body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY']),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -218,7 +245,7 @@ router.put(
         });
       }
 
-      const { name, quantity, store, section, notes, priority, isDone } =
+      const { name, quantity, store, section, notes, priority, isDone, price, currency } =
         req.body;
 
       if (name !== undefined) item.name = name;
@@ -228,6 +255,23 @@ router.put(
       if (notes !== undefined) item.notes = notes;
       if (priority !== undefined) item.priority = priority;
       if (isDone !== undefined) item.isDone = isDone;
+      
+      // Handle price updates
+      if (price !== undefined && price !== null) {
+        const oldPrice = item.price;
+        item.price = price;
+        item.priceUpdatedAt = new Date();
+        if (currency) item.currency = currency;
+        
+        // Add to price history if price changed
+        if (oldPrice !== price) {
+          item.priceHistory.push({
+            price: price,
+            date: new Date(),
+            store: store || item.store || '',
+          });
+        }
+      }
 
       await item.save();
 

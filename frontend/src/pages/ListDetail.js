@@ -61,6 +61,9 @@ const SortableItem = ({ item, onToggle, onEdit, onDelete }) => {
         <div className="item-meta">
           {item.quantity && <span className="item-quantity">{item.quantity}</span>}
           {item.section && <span className="item-section">• {item.section}</span>}
+          {item.price && (
+            <span className="item-price">• ${parseFloat(item.price).toFixed(2)}</span>
+          )}
         </div>
       </div>
       <button
@@ -273,6 +276,21 @@ const ListDetail = () => {
   const activeItems = items.filter((item) => !item.isDone);
   const doneItems = items.filter((item) => item.isDone);
 
+  // Calculate totals for price tracking
+  const totalCost = items.reduce((sum, item) => {
+    const itemPrice = parseFloat(item.price) || 0;
+    const itemQuantity = parseFloat(item.quantity) || 1;
+    return sum + (itemPrice * itemQuantity);
+  }, 0);
+
+  const budget = list?.budget || null;
+  const remaining = budget ? budget - totalCost : null;
+  const budgetPercentage = budget ? Math.min((totalCost / budget) * 100, 100) : 0;
+
+  let budgetStatus = 'success';
+  if (budgetPercentage >= 100) budgetStatus = 'danger';
+  else if (budgetPercentage >= 80) budgetStatus = 'warning';
+
   // Group items by store and section for grouped view
   const groupedItems = items.reduce((acc, item) => {
     const store = item.store || list?.store || 'No Store';
@@ -333,6 +351,42 @@ const ListDetail = () => {
 
       {/* Main Content */}
       <main className="list-detail-main">
+        {/* Budget Summary */}
+        {(totalCost > 0 || budget) && (
+          <div className="budget-summary">
+            <div className="budget-summary-item">
+              <span className="budget-summary-label">Total Cost</span>
+              <span className={`budget-summary-value ${budget && totalCost > budget ? 'danger' : ''}`}>
+                ${totalCost.toFixed(2)}
+              </span>
+            </div>
+            {budget && (
+              <>
+                <div className="budget-summary-item">
+                  <span className="budget-summary-label">Budget</span>
+                  <span className="budget-summary-value">
+                    ${budget.toFixed(2)}
+                  </span>
+                </div>
+                <div className="budget-summary-item">
+                  <span className="budget-summary-label">Remaining</span>
+                  <span className={`budget-summary-value ${budgetStatus}`}>
+                    ${remaining.toFixed(2)}
+                  </span>
+                </div>
+              </>
+            )}
+            {budget && (
+              <div className="budget-progress" style={{ width: '100%' }}>
+                <div 
+                  className={`budget-progress-bar ${budgetStatus}`}
+                  style={{ width: `${budgetPercentage}%` }}
+                ></div>
+              </div>
+            )}
+          </div>
+        )}
+
         {items.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">🛒</div>
@@ -643,6 +697,24 @@ const ListDetail = () => {
                   placeholder="Any special instructions..."
                   rows="3"
                 />
+              </div>
+              <div className="form-group">
+                <label htmlFor="editItemPrice">Price (optional)</label>
+                <div className="price-input-wrapper">
+                  <span className="currency-symbol">$</span>
+                  <input
+                    type="number"
+                    id="editItemPrice"
+                    value={editingItem.price || ''}
+                    onChange={(e) =>
+                      setEditingItem({ ...editingItem, price: e.target.value })
+                    }
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+                <small className="form-hint">Track item cost for budgeting</small>
               </div>
               <div className="modal-actions">
                 <button
